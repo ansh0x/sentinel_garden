@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from models import SentinelGardenAction, SentinelGardenObservation
+from .models import SentinelGardenAction, SentinelGardenObservation
 
 # ---------------------------------------------------------------------------
 # System prompt used to frame observations for the policy LLM.

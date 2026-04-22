@@ -26,13 +26,13 @@ Usage:
 
 __version__ = "2.0.0"
 
-from models import (
+from .models import (
     SentinelGardenAction,
     SentinelGardenObservation,
     SentinelGardenState,
     VALID_TASKS,
 )
-from client import SentinelGardenEnv
+from .client import SentinelGardenEnv
 
 __all__ = [
     "SentinelGardenAction",

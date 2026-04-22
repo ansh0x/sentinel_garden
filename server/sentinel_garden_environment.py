@@ -72,6 +72,8 @@ class SentinelGardenEnvironment(Environment):
         config: Additional configuration dictionary.
     """
 
+    SUPPORTS_CONCURRENT_SESSIONS = True
+
     def __init__(
         self,
         data: Optional[List[Dict[str, Any]]] = None,
@@ -85,10 +87,7 @@ class SentinelGardenEnvironment(Environment):
         self.config = config or {}
 
         # Scoring mode
-        self.scoring_mode = (
-            scoring_mode
-            or os.getenv("SENTINEL_SCORING_MODE", "prelabeled")
-        )
+        self.scoring_mode = scoring_mode or os.getenv("SENTINEL_SCORING_MODE", "prelabeled")
         if self.scoring_mode not in ("prelabeled", "judge", "hybrid"):
             logger.warning("Invalid scoring mode %r, using prelabeled", self.scoring_mode)
             self.scoring_mode = "prelabeled"
@@ -174,10 +173,7 @@ class SentinelGardenEnvironment(Environment):
         start_time = time.time()
 
         # Determine task type
-        raw_task = (
-            task_type
-            or os.getenv("SENTINEL_TASK", "guardrail_enforcer").strip()
-        )
+        raw_task = task_type or os.getenv("SENTINEL_TASK", "guardrail_enforcer").strip()
         if raw_task not in self.task_registry.list_tasks():
             logger.warning("Unknown task %r, using guardrail_enforcer", raw_task)
             raw_task = "guardrail_enforcer"
@@ -186,6 +182,7 @@ class SentinelGardenEnvironment(Environment):
         # Select session
         if data is not None:
             import random
+
             self._session = random.choice(data)
         else:
             sessions = self.session_store.load_sessions(
@@ -199,6 +196,7 @@ class SentinelGardenEnvironment(Environment):
             if not sessions:
                 raise RuntimeError("No sessions available in the session store")
             import random
+
             self._session = random.choice(sessions).model_dump()
 
         guardrail = self._session["chat_history"][0]["content"]
@@ -238,7 +236,9 @@ class SentinelGardenEnvironment(Environment):
 
         logger.debug(
             "Reset episode=%s task=%s turns=%d (%.1fms)",
-            episode_id, self._current_task, len(labels),
+            episode_id,
+            self._current_task,
+            len(labels),
             (time.time() - start_time) * 1000,
         )
         return obs
@@ -397,6 +397,7 @@ class SentinelGardenEnvironment(Environment):
 # In-memory session store for backward compatibility
 # ---------------------------------------------------------------------------
 
+
 class _InMemorySessionStore(SessionStore):
     """Wraps raw session data for backward compatibility."""
 
@@ -405,6 +406,7 @@ class _InMemorySessionStore(SessionStore):
 
     def load_sessions(self, filters: Optional[SessionFilter] = None):
         from models import Session
+
         result = []
         for item in self._data:
             try:
