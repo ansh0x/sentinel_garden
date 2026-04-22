@@ -47,12 +47,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         uv sync --no-install-project --no-editable; \
     fi
 
-# RUN --mount=type=cache,target=/root/.cache/uv \
-#     if [ -f uv.lock ]; then \
-#         uv sync --frozen --no-editable; \
-#     else \
-#         uv sync --no-editable; \
-#     fi
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ -f uv.lock ]; then \
+        uv sync --frozen --no-editable; \
+    else \
+        uv sync --no-editable; \
+    fi
 
 # Final runtime stage
 FROM ${BASE_IMAGE}
