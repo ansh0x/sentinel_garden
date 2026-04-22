@@ -59,15 +59,6 @@ ENV SENTINEL_CONFIG=/app/config.yaml
 ENV SENTINEL_SCORING_MODE=prelabeled
 
 # Deep health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python -c "
-import requests, sys
-try:
-    r = requests.get('http://localhost:8000/health', timeout=5)
-    sys.exit(0 if r.status_code == 200 and r.json().get('status') == 'healthy' else 1)
-except:
-    sys.exit(1)
-" || exit 1
 
 # Run the server
 CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
