@@ -9,81 +9,34 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sentinel-garden"
-version = "2.0.0"
-description = "Sentinel Garden v2 — Market-Ready RL Environment for LLM Safety Overseers"
-readme = "README.md"
+name = "openenv-sentinel_garden"
+version = "0.2.0"
+description = "Sentinel Garden environment for OpenEnv"
 requires-python = ">=3.10"
-authors = [{ name = "Meta X Scalar Hackathon" }]
-keywords = ["rl", "llm", "safety", "overseer", "openenv", "guardrails"]
-
 dependencies = [
-  # Core OpenEnv runtime (FastAPI server + HTTP/WebSocket client)
-  "openenv-core[core]>=0.2.2",
-  # Pydantic v2 for data validation
-  "pydantic>=2.0.0",
-  # Semantic similarity for internal_note reward
-  "sentence-transformers>=2.2.0",
-  # torch is pulled by sentence-transformers but be explicit
-  "torch>=2.0.0",
-  # YAML configuration
-  "pyyaml>=6.0",
-  # HTTP client for judge LLM
-  "httpx>=0.25.0",
-  # OpenAI-compatible client for judge mode
-  "openai>=1.0.0",
-  # Async utilities
-  "anyio>=4.0.0",
-  # Rate limiting for judge API
-  "aiolimiter>=1.1.0",
+    # Core OpenEnv runtime (FastAPI server + HTTP/WebSocket client)
+    "openenv-core[core]>=0.2.2",
+    # ASGI server — required by app.py at import time
+    "uvicorn>=0.29.0",
 ]
 
 [project.optional-dependencies]
-train = [
-  # TRL for GRPO training
-  "trl>=0.15.0",
-  # Transformers
-  "transformers>=4.40.0",
-  # Datasets
-  "datasets>=2.14.0",
-  # Weights & Biases logging
-  "wandb>=0.16.0",
+# sentence-transformers and torch are no longer required by the default
+# reward function (note_reward has been removed). Install this group only
+# if you are running a custom grader that scores free-text outputs.
+nlp = [
+    "sentence-transformers>=2.2.0",
+    "torch>=2.0.0",
 ]
 dev = [
-  "pytest>=8.0.0",
-  "pytest-cov>=4.0.0",
-  "pytest-asyncio>=0.23.0",
-  "mypy>=1.8.0",
-  "ruff>=0.3.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
 ]
-all = ["sentinel-garden[train,dev]"]
 
 [project.scripts]
-sentinel-server = "sentinel_garden.server.app:main"
-
-[project.urls]
-Homepage = "https://github.com/ansh0x/sentinel_garden"
-Repository = "https://github.com/ansh0x/sentinel_garden"
+server = "sentinel_garden.server.app:main"
 
 [tool.setuptools]
 include-package-data = true
-packages = [
-  "sentinel_garden",
-  "sentinel_garden.server",
-  "sentinel_garden.scoring",
-  "sentinel_garden.session_store",
-  "sentinel_garden.episode_logging",
-]
-
-[tool.ruff]
-line-length = 100
-target-version = "py310"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP", "B", "C4"]
-
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+packages = ["sentinel_garden", "sentinel_garden.server"]
+package-dir = { "sentinel_garden" = ".", "sentinel_garden.server" = "server" }
